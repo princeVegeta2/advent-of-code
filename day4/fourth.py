@@ -12,33 +12,27 @@ class FourthAdvent(object):
         
         return xmasList
     
-    def findMas(self, xmasList):
-        occurences = 0
+    def isMas(self, xmasList, i, j):
         rows = len(xmasList)
-        cols = len(xmasList[0]) if rows > 0 else 0
+        cols = len(xmasList[0])
 
-        for i in range(rows):
-            for j in range(cols):
-                if xmasList[i][j] == 'A':
-                    if (
-                        (0 <= i - 1 < rows and 0 <= j - 1 < cols and 0 <= i + 1 < rows and 0 <= j + 1 < cols) and
-                        (
-                            (xmasList[i - 1][j - 1] == 'M' and xmasList[i + 1][j + 1] == 'S') or 
-                            (xmasList[i - 1][j - 1] == 'S' and xmasList[i + 1][j + 1] == 'M')
-                        )
-                    ):
-                        occurences += 1
-                    
-                    if (
-                        (0 <= i - 1 < rows and 0 <= j + 1 < cols and 0 <= i + 1 < rows and 0 <= j - 1 < cols) and
-                        (
-                            (xmasList[i - 1][j + 1] == 'M' and xmasList[i + 1][j - 1] == 'S') or
-                            (xmasList[i - 1][j + 1] == 'S' and xmasList[i + 1][j - 1] == 'M')
-                        )
-                    ):
-                        occurences += 1
+        if xmasList[i][j] != 'A':
+            return False
+        if i - 1 < 0 or i + 1 >= rows or j - 1 < 0 or j + 1 >= cols:
+            return False 
         
-        return occurences
+        mases = 0
+
+        primary = xmasList[i - 1][j - 1] + xmasList[i][j] + xmasList[i + 1][j + 1]
+        if primary == 'MAS' or primary == 'SAM':
+            mases += 1
+        
+        secondary = xmasList[i - 1][j + 1] + xmasList[j][j] + xmasList[i + 1][j - 1]
+        if secondary == 'MAS' or secondary == 'SAM':
+            mases += 1
+        
+        return mases == 2
+
                         
 
 
@@ -64,7 +58,7 @@ class FourthAdvent(object):
             # Reversed
             occurances += len(re.findall(pattern, string[::-1]))
 
-        # Process primary diagonals (top-left to bottom-right)
+        # Process primary diagonals 
         for col in range(cols):
             diag_list = []
             r, c = 0, col
@@ -89,7 +83,7 @@ class FourthAdvent(object):
             # Reversed
             occurances += len(re.findall(pattern, string[::-1]))
 
-        # Process anti-diagonals (top-right to bottom-left)
+        # Process anti-diagonals 
         for col in range(cols - 1, -1, -1):
             diag_list = []
             r, c = 0, col
@@ -122,3 +116,12 @@ inputList = fourthAdvent.getInput('input.txt')
 occurances = fourthAdvent.findLists(inputList)
 print("Occurrences:", occurances)
 
+# MAS
+rows = len(inputList)
+cols = len(inputList[0])
+occurances = 0
+for i in range(rows):
+    for j in range(cols):
+        if fourthAdvent.isMas(inputList, i, j):
+            occurances += 1
+print("MAS's: ", occurances)
